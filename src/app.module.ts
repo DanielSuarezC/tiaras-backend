@@ -18,7 +18,7 @@ import { UsuariosModule } from './usuarios/usuarios.module';
         port: 5432,
         username: 'postgres',
         password: 'admin',
-        database: 'tiaras_authentication',
+        database: 'tiaras_auth',
         entities: [UsuarioAuthEntity, RolAuthEntity],
         autoLoadEntities: true,
         synchronize: true
