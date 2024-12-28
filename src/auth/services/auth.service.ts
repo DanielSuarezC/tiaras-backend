@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsuarioAuthEntity } from '../domain/entities/UsuarioAuth.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { UsuarioSignIn } from '../domain/dto/UsuarioSignIn.dto';
 import { RolAuthEntity } from '../domain/entities/RolAuth.entity';
