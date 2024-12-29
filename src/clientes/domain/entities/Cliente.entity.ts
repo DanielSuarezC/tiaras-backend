@@ -11,8 +11,8 @@ export class ClienteEntity {
     @Column({ name: 'apellidos', type: 'varchar', length: 60 })
     apellidos: string;
 
-    @Column({ name: 'correo', type: 'varchar', length: 60 })
-    correo: string;
+    @Column({ name: 'email', type: 'varchar', length: 60 })
+    email: string;
 
     @Column({ name: 'telefono', type: 'varchar', length: 10 })
     telefono: string;
