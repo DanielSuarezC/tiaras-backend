@@ -15,7 +15,7 @@ export class UsuarioRegister {
     @IsNotEmpty()
     email: string;
 
-    @IsNotEmpty()
+    
     password: string;
 
     @IsInt()
