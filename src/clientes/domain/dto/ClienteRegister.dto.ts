@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, Validate } from "class-validator";
-import { CustomTelephoneRegPattern } from "src/usuarios/validations/CustomTelephoneRegPattern";
+import { CustomTelephoneRegPattern } from "src/clientes/validations/CustomTelephoneRegPattern";
 
 export class ClienteRegister {
     @IsNotEmpty()
@@ -10,7 +10,7 @@ export class ClienteRegister {
 
     @IsEmail()
     @IsNotEmpty()
-    correo: string;
+    email: string;
 
     @IsNotEmpty()
     @Validate(CustomTelephoneRegPattern)
