@@ -8,6 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { UsuarioAuthEntity } from './auth/domain/entities/UsuarioAuth.entity';
 import { RolAuthEntity } from './auth/domain/entities/RolAuth.entity';
 import { UsuariosModule } from './usuarios/usuarios.module';
+import { ProductosModule } from './productos/productos.module';
+import { ProductoEntity } from './productos/domain/entities/Producto.entity';
+import { CategoriasModule } from './categorias/categorias.module';
+import { CategoriaEntity } from './categorias/domain/entites/Categoria.entity';
 
 @Module({
   imports: [
@@ -33,7 +37,7 @@ import { UsuariosModule } from './usuarios/usuarios.module';
         username: 'postgres',
         password: 'root',
         database: 'tiaras_main',
-        entities: [ClienteEntity],
+        entities: [ClienteEntity, ProductoEntity, CategoriaEntity],
         autoLoadEntities: true,
         synchronize: true
       }),
@@ -41,7 +45,9 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     }),
     ClientesModule,
     AuthModule,
-    UsuariosModule
+    UsuariosModule,
+    ProductosModule,
+    CategoriasModule
   ],
   controllers: [AppController],
   providers: [AppService],
