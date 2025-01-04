@@ -1,5 +1,6 @@
+import { Transform } from "class-transformer";
 import { CategoriaEntity } from "src/categorias/domain/entites/Categoria.entity";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'productos' })
 export class ProductoEntity {
@@ -18,7 +19,8 @@ export class ProductoEntity {
     @Column({ name: 'imagenes', array: true, type: 'text' })
     imagenes: string[];
 
-    @ManyToMany(() => CategoriaEntity, categoria => categoria.idCategoria)
+    @ManyToMany(() => CategoriaEntity, { eager: true })
+    @Transform(({ value }) => value.map(val => val.nombre))
     @JoinTable({ name: 'productos_categorias', joinColumn: { name: 'id_producto' }, inverseJoinColumn: { name: 'id_categoria' } })
     categorias: CategoriaEntity[];
 }
