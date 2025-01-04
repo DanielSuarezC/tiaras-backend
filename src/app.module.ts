@@ -12,6 +12,13 @@ import { ProductosModule } from './productos/productos.module';
 import { ProductoEntity } from './productos/domain/entities/Producto.entity';
 import { CategoriasModule } from './categorias/categorias.module';
 import { CategoriaEntity } from './categorias/domain/entites/Categoria.entity';
+import { PedidosModule } from './pedidos/pedidos.module';
+import { InventariosModule } from './inventarios/inventarios.module';
+import { PedidoEntity } from './pedidos/domain/entities/pedido.entity';
+import { ItemEntity } from './pedidos/domain/entities/Item.entity';
+import { InventarioProductoEntity } from './inventarios/domain/entities/InventarioProducto.entity';
+import { ProductoStockEntity } from './inventarios/domain/entities/ProductoStock.entity';
+import { InsumosModule } from './insumos/insumos.module';
 
 @Module({
   imports: [
@@ -37,7 +44,7 @@ import { CategoriaEntity } from './categorias/domain/entites/Categoria.entity';
         username: 'postgres',
         password: 'root',
         database: 'tiaras_main',
-        entities: [ClienteEntity, ProductoEntity, CategoriaEntity],
+        entities: [ClienteEntity, ProductoEntity, CategoriaEntity, PedidoEntity, ItemEntity, InventarioProductoEntity, ProductoStockEntity],
         autoLoadEntities: true,
         synchronize: true
       }),
@@ -47,7 +54,10 @@ import { CategoriaEntity } from './categorias/domain/entites/Categoria.entity';
     AuthModule,
     UsuariosModule,
     ProductosModule,
-    CategoriasModule
+    CategoriasModule,
+    PedidosModule,
+    InventariosModule,
+    InsumosModule
   ],
   controllers: [AppController],
   providers: [AppService],
