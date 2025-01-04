@@ -1,8 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
 import { AllowAnon } from './decorators/public.decorator';
-import { UsuarioSignIn } from './domain/dto/UsuarioSignIn.dto';
-import { UsuarioLogin } from './domain/dto/UsuarioLogin.dto';
+import { UsuarioLoginDto } from './domain/dto/login-usuario';
 
 @Controller('auth')
 export class AuthController {
@@ -18,7 +17,7 @@ export class AuthController {
 
     @AllowAnon()
     @Post('login')
-    async login(@Body() usuarioLogin: UsuarioLogin): Promise<any> {
+    async login(@Body() usuarioLogin: UsuarioLoginDto): Promise<any> {
         const { email, password } = usuarioLogin;
         return this.authService.login(email, password);
     }

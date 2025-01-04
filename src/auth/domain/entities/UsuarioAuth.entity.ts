@@ -1,9 +1,9 @@
 import { Exclude } from "class-transformer";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { RolAuthEntity } from "./RolAuth.entity";
+import { RolAuth } from "./RolAuth.entity";
 
 @Entity({ name: 'usuarios' })
-export class UsuarioAuthEntity {
+export class UsuarioAuth {
     @PrimaryGeneratedColumn("identity", { name: 'id_usuario' })
     idUsuario: number;
 
@@ -14,7 +14,7 @@ export class UsuarioAuthEntity {
     @Column({ type: 'varchar', length: 60 })
     password: string;
 
-    @ManyToOne(() => RolAuthEntity, { eager: true })
+    @ManyToOne(() => RolAuth, { eager: true })
     @JoinColumn({ name: 'id_rol' })
-    rol: RolAuthEntity;
+    rol: RolAuth;
 }
