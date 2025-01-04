@@ -4,7 +4,6 @@ import { EntityManager, Repository } from 'typeorm';
 import { UsuarioEntity } from '../domain/entites/Usuario.entity';
 import { UsuarioRegister } from '../domain/dto/UsuarioRegister';
 import { UsuarioSignIn } from 'src/auth/domain/dto/UsuarioSignIn.dto';
-import { UsuarioRegistered } from '../../auth/domain/dto/UsuarioRegistered.dto';
 import { AuthService } from 'src/auth/services/auth.service';
 
 @Injectable()
