@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { ProductoRegister } from './domain/dto/ProductoRegister.dto';
-import { ApiBody, ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateProductoDto } from './dto/create-producto.dto';
 
 @Controller('productos')
 @ApiTags('Productos')
@@ -16,6 +16,34 @@ export class ProductosController {
     ) {}
 
     @Get()
+    @ApiOperation({ summary: 'Obtener todos los productos' })
+    @ApiResponse({ 
+        status: 200, 
+        description: 'Productos encontrados', 
+        schema: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    idProducto: { type: 'number' },
+                    nombre: { type: 'string' },
+                    descripcion: { type: 'string' },
+                    precio: { type: 'number' },
+                    imagenes: { type: 'array', items: { type: 'string' } },
+                    categorias: { 
+                        type: 'array', 
+                        items: { 
+                            type: 'object', 
+                            properties:  {
+                                idCategoria: { type: 'number' },
+                                nombre: { type: 'string' }
+                            }
+                        } 
+                    }
+                }
+            }
+        }
+    })
     @UseInterceptors(ClassSerializerInterceptor)
     async findAll() {
         return await this.productosService.findAll();
@@ -23,14 +51,86 @@ export class ProductosController {
     
     @Get(':idProducto')
     @ApiOperation({ summary: 'Obtener un producto por ID' })
-    @ApiBody({ type: Number, description: 'ID del producto' })
-    @ApiResponse({ status: 200, description: 'Producto encontrado', content: { 'application/json': { example: { message: 'Producto Obtenido', data: { idProducto: 1 } } } } })
+    @ApiParam({  name: 'idProducto', description: 'ID del producto', schema: { type: 'number' } })
+    @ApiResponse({ 
+        status: 200, 
+        description: 'Producto encontrado', 
+        schema:  {
+            type: 'object',
+            properties: {
+                idProducto: { type: 'number' },
+                nombre: { type: 'string' },
+                descripcion: { type: 'string' },
+                precio: { type: 'number' },
+                imagenes: { type: 'array', items: { type: 'string' } },
+                categorias: { 
+                    type: 'array', 
+                    items: { 
+                        type: 'object', 
+                        properties:  {
+                            idCategoria: { type: 'number' },
+                            nombre: { type: 'string' }
+                        }
+                    } 
+                }
+            }
+        }
+    })
     @UseInterceptors(ClassSerializerInterceptor)
     async findOne(idProducto: number) {
         return await this.productosService.findOne(idProducto);
     }
 
     @Post()
+    @ApiOperation({ summary: 'Crear un producto' })
+    @ApiBody({ 
+        type: 'object', 
+        description: 'Datos del producto',
+        required: true,
+        schema: {
+            type: 'object',
+            properties: {
+                producto: { 
+                    type: 'string',
+                    format: 'json',
+                    example: JSON.stringify({ 
+                        nombre: 'Producto 1', 
+                        descripcion: 'Descripción del producto', 
+                        precio: 1000, 
+                        categorias: [1, 2] 
+                    })
+                },
+                files: {
+                    type: 'array',
+                    items: { type: 'file' }
+                }
+            }
+        }
+    })
+    @ApiResponse({ 
+        status: 201, 
+        description: 'Producto creado', 
+        schema:  {
+            type: 'object',
+            properties: {
+                idProducto: { type: 'number' },
+                nombre: { type: 'string' },
+                descripcion: { type: 'string' },
+                precio: { type: 'number' },
+                imagenes: { type: 'array', items: { type: 'string' } },
+                categorias: { 
+                    type: 'array', 
+                    items: { 
+                        type: 'object', 
+                        properties:  {
+                            idCategoria: { type: 'number' },
+                            nombre: { type: 'string' }
+                        }
+                    } 
+                }
+            }
+        }
+    })
     @UseInterceptors(
         FilesInterceptor('files', 10, {
             storage: diskStorage({
@@ -50,24 +150,22 @@ export class ProductosController {
     async create(
         @Body('producto') producto: string, 
         @UploadedFiles(new ParseFilePipe({ 
-            validators: [ 
-                new FileTypeValidator({ fileType: /^image/ }) 
-                ] 
+            validators: [ new FileTypeValidator({ fileType: /^image/ }) ] 
         })) files: Array<Express.Multer.File>
     ) {
         if (!files || files.length === 0) throw BadRequestException.createBody(null, 'No se han subido archivos', HttpStatus.BAD_REQUEST);
         const fileNames = files.map(file => file.filename);
-        let productoRegister: ProductoRegister;
+        let createProductoDto: CreateProductoDto;
 
         try {
             const parseData = JSON.parse(producto);
-            productoRegister = Object.assign(new ProductoRegister(), parseData);
+            createProductoDto = Object.assign(new CreateProductoDto(), parseData);
 
             if (
-                !productoRegister.nombre || 
-                !productoRegister.descripcion || 
-                !productoRegister.precio || 
-                !Array.isArray(productoRegister.categorias)
+                !createProductoDto.nombre || 
+                !createProductoDto.descripcion || 
+                !createProductoDto.precio || 
+                !Array.isArray(createProductoDto.categorias)
             ) {
                 await this.deleteFiles(fileNames);
                 throw BadRequestException.createBody(null, 'Faltan campos obligatorios', HttpStatus.BAD_REQUEST);
@@ -78,7 +176,7 @@ export class ProductosController {
         }
 
         
-        return await this.productosService.create(productoRegister, fileNames);
+        return await this.productosService.create(createProductoDto, fileNames);
     }
 
     /* Eliminar Imágenes Subidas */
