@@ -4,7 +4,7 @@ import { ROLES_KEY } from 'src/auth/decorators/roles.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from 'src/auth/constants';
 import { extractTokenFromHeader } from 'src/auth/utilities/extract-token';
-import { RolEnum } from 'src/auth/domain/dto/roles.enum';
+import { RolEnum } from 'src/auth/dto/roles.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
