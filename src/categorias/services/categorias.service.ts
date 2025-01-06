@@ -1,40 +1,44 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository, UpdateResult } from 'typeorm';
-import { CategoriaEntity } from '../domain/entites/Categoria.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CategoriaRegister } from '../domain/dto/CategoriaRegister.dto';
+import { Categoria } from '../entites/Categoria.entity';
+import { CreateCategoriaDto } from '../dto/create-categoria.dto';
+import { UpdateCategoriaDto } from '../dto/update-categoria.dto';
 
 @Injectable()
 export class CategoriasService {
     constructor(
-        @InjectRepository(CategoriaEntity, 'main')
-        private readonly categoriasRepository: Repository<CategoriaEntity>
+        @InjectRepository(Categoria, 'main')
+        private readonly categoriasRepository: Repository<Categoria>
     ) {}
 
     /* Obtener todas las Categorías */
-    async findAll(): Promise<CategoriaEntity[]> {
+    async findAll(): Promise<Categoria[]> {
         return this.categoriasRepository.find();
     }
 
     /* Obtener una Categoría por ID */
-    async findOne(idCategoria: number): Promise<CategoriaEntity> {
+    async findOne(idCategoria: number): Promise<Categoria> {
         return this.categoriasRepository.findOneBy({ idCategoria });
     }
 
     /* Crear nueva Categoría */
-    async create(categoria: CategoriaRegister): Promise<CategoriaEntity> {
-        const categoriaEntity = new CategoriaEntity();
-        categoriaEntity.nombre = categoria.nombre;
+    async create(createCategoriaDto: CreateCategoriaDto): Promise<Categoria> {
+        const categoria = new Categoria();
+        categoria.nombre = createCategoriaDto.nombre;
 
-        return this.categoriasRepository.save(categoriaEntity);
+        return this.categoriasRepository.save(categoria);
     }
 
     /* Actualizar Categoría */
-    async update(idCategoria: number, categoria: CategoriaRegister): Promise<UpdateResult> {
+    async update(idCategoria: number, updateCategoriaDto: UpdateCategoriaDto): Promise<UpdateResult> {
         const categoriaToUpdate = this.categoriasRepository.findOneBy({ idCategoria });
         if (!categoriaToUpdate) throw NotFoundException;
 
-        return await this.categoriasRepository.update(idCategoria, categoria);
+        const update = new Categoria();
+        update.nombre = updateCategoriaDto.nombre;
+
+        return await this.categoriasRepository.update(idCategoria, update);
     }
 
     /* Eliminar Categoría */

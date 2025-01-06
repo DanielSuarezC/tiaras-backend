@@ -1,52 +1,48 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductoEntity } from '../domain/entities/Producto.entity';
+import { Categoria } from 'src/categorias/entites/Categoria.entity';
 import { Repository, In } from 'typeorm';
-import { ProductoRegister } from '../domain/dto/ProductoRegister.dto';
-import { CategoriaEntity } from 'src/categorias/domain/entites/Categoria.entity';
+import { Producto } from '../entities/Producto.entity';
+import { CreateProductoDto } from '../dto/create-producto.dto';
 
 @Injectable()
 export class ProductosService {
     constructor(
-        @InjectRepository(ProductoEntity, 'main')
-        private readonly productoRepository: Repository<ProductoEntity>,
-        @InjectRepository(CategoriaEntity, 'main')
-        private readonly categoriaRepository: Repository<CategoriaEntity>
+        @InjectRepository(Producto, 'main')
+        private readonly productoRepository: Repository<Producto>,
+        @InjectRepository(Categoria, 'main')
+        private readonly categoriaRepository: Repository<Categoria>
     ) {}
 
-    async findAll(): Promise<[ProductoEntity[], number]> {
+    async findAll(): Promise<[Producto[], number]> {
         return await this.productoRepository.findAndCount({ take: 25 });
     }
 
-    async findOne(idProducto: number): Promise<ProductoEntity> {
+    async findOne(idProducto: number): Promise<Producto> {
         return await this.productoRepository.findOneBy({ idProducto });
     }
 
-    async existsByIds(ids: number[]): Promise<boolean> {
-        return await this.productoRepository.existsBy({ idProducto: In(ids) });
-    }
-
-    async findByIds(ids: number[]): Promise<ProductoEntity[]> {
+    async findByIds(ids: number[]): Promise<Producto[]> {
         return await this.productoRepository.findBy({ idProducto: In(ids) });
     }
 
-    async create(producto: ProductoRegister, fileNames: string[]): Promise<ProductoEntity> {
-        const productoEntity = new ProductoEntity();
-        productoEntity.nombre = producto.nombre;
-        productoEntity.descripcion = producto.descripcion;
-        productoEntity.precio = producto.precio;
-        productoEntity.imagenes = fileNames;
+    async create(createProductoDto: CreateProductoDto, fileNames: string[]): Promise<Producto> {
+        const producto = new Producto();
+        producto.nombre = createProductoDto.nombre;
+        producto.descripcion = createProductoDto.descripcion;
+        producto.precio = createProductoDto.precio;
+        producto.imagenes = fileNames;
 
-        const categoriasExists: boolean = await this.categoriaRepository.existsBy({ idCategoria: In(producto.categorias) });
+        const categoriasExists: boolean = await this.categoriaRepository.existsBy({ idCategoria: In(createProductoDto.categorias) });
         if (!categoriasExists) throw new Error('Alguna de las categorías no existe');
 
-        const categorias: CategoriaEntity[] = await this.categoriaRepository.findBy({ idCategoria: In(producto.categorias) });
-        productoEntity.categorias = categorias;
+        const categorias: Categoria[] = await this.categoriaRepository.findBy({ idCategoria: In(createProductoDto.categorias) });
+        producto.categorias = categorias;
 
-        return await this.productoRepository.save(productoEntity);
+        return await this.productoRepository.save(producto);
     }
 
-    async update(producto: ProductoEntity): Promise<ProductoEntity> {
+    async update(producto: Producto): Promise<Producto> {
         return await this.productoRepository.save(producto);
     }
 

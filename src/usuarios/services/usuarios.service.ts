@@ -1,46 +1,47 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
-import { UsuarioEntity } from '../domain/entites/Usuario.entity';
-import { UsuarioRegister } from '../domain/dto/UsuarioRegister';
-import { UsuarioSignIn } from 'src/auth/domain/dto/UsuarioSignIn.dto';
 import { AuthService } from 'src/auth/services/auth.service';
+import { Usuario } from '../entites/Usuario.entity';
+import { CreateUsuarioAuthDto } from 'src/auth/dto/create-usuario';
+import { UpdateUsuarioAuthDto } from 'src/auth/dto/update-usuario.dto';
+import { CreateUsuarioDto } from '../dto/create-usuario.dto';
 
 @Injectable()
 export class UsuariosService {
     constructor(
         @InjectEntityManager('main')
         private readonly entityManager: EntityManager,
-        @InjectRepository(UsuarioEntity, 'main')
-        private readonly usuariosRepository: Repository<UsuarioEntity>,
+        @InjectRepository(Usuario, 'main')
+        private readonly usuariosRepository: Repository<Usuario>,
         private readonly authService: AuthService
     ) {}
 
     /* Obtener todos los Usuarios */
-    async getUsuarios(): Promise<UsuarioEntity[]> {
+    async getUsuarios(): Promise<Usuario[]> {
         return await this.usuariosRepository.find();
     }
 
     /* Registrar nuevo Usuario */
-    async createUsuario(usuario: UsuarioRegister): Promise<any> {
+    async createUsuario(createUsuarioDto: CreateUsuarioDto): Promise<any> {
         try {
             await this.entityManager.transaction(async (transactionEntityManager: EntityManager) => {
-                const usuarioSignIn: UsuarioSignIn = new UsuarioSignIn();
-                usuarioSignIn.email = usuario.email;
-                usuarioSignIn.password = usuario.password;
-                usuarioSignIn.rol = usuario.rol;
+                const createUsuarioAuthDto: CreateUsuarioAuthDto = new CreateUsuarioAuthDto();
+                createUsuarioAuthDto.email = createUsuarioDto.email;
+                createUsuarioAuthDto.password = createUsuarioDto.password;
+                createUsuarioAuthDto.rol = createUsuarioDto.rol;
 
-                const idUsuarioRegistered: number = await this.authService.signIn(usuarioSignIn);
+                const idUsuarioRegistered: number = await this.authService.signIn(createUsuarioAuthDto);
                 if (!idUsuarioRegistered) throw BadRequestException;
 
-                const usuarioEntity: UsuarioEntity = new UsuarioEntity();
-                usuarioEntity.idUsuario = idUsuarioRegistered;
-                usuarioEntity.nombre = usuario.nombre;
-                usuarioEntity.apellidos = usuario.apellidos;
-                usuarioEntity.telefono = usuario.telefono;
-                usuarioEntity.email = usuario.email;
+                const usuario: Usuario = new Usuario();
+                usuario.idUsuario = idUsuarioRegistered;
+                usuario.nombre = usuario.nombre;
+                usuario.apellidos = usuario.apellidos;
+                usuario.telefono = usuario.telefono;
+                usuario.email = usuario.email;
                 
-                return await this.usuariosRepository.save(usuarioEntity);
+                return await this.usuariosRepository.save(usuario);
             });
         } catch (error) {
             throw new BadRequestException(error.message);
@@ -48,24 +49,21 @@ export class UsuariosService {
     }
 
     /* Actualizar Usuario */
-    async updateUsuario(idUsuario: number, usuario: UsuarioRegister): Promise<any> {
+    async updateUsuario(idUsuario: number, updateUsuarioDto): Promise<any> {
+        const usuario: Usuario = await this.usuariosRepository.findOneBy({ idUsuario });
+        if (!usuario) throw NotFoundException;
 
-        const usuarioEntity: UsuarioEntity = await this.usuariosRepository.findOneBy({ idUsuario: idUsuario });
-        if (!usuarioEntity) throw NotFoundException;
+        usuario.nombre = updateUsuarioDto.nombre;
+        usuario.apellidos = updateUsuarioDto.apellidos;
+        usuario.telefono = updateUsuarioDto.telefono;
+        usuario.email = updateUsuarioDto.email;
 
-        usuarioEntity.nombre = usuario.nombre;
-        usuarioEntity.apellidos = usuario.apellidos;
-        usuarioEntity.telefono = usuario.telefono;
-        usuarioEntity.email = usuario.email;
+        const updateUsuarioAuthDto: UpdateUsuarioAuthDto = new UpdateUsuarioAuthDto();
+        updateUsuarioAuthDto.email = usuario.email;
 
-        const usuarioSignIn: UsuarioSignIn = new UsuarioSignIn();
-        usuarioSignIn.email = usuario.email;
+        if (updateUsuarioAuthDto.password.trim() !== '') updateUsuarioAuthDto.password = updateUsuarioDto.password;
+        updateUsuarioAuthDto.rol = updateUsuarioDto.rol;
 
-        if (usuario.password.trim() !== '') usuarioSignIn.password = usuario.password;
-        usuarioSignIn.rol = usuario.rol;
-
-        const idUsuarioRegistered: number = await this.authService.signIn(usuarioSignIn);
-
-        return await this.usuariosRepository.save(usuarioEntity);
+        return await this.usuariosRepository.save(usuario);
     }
 }

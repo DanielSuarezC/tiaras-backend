@@ -1,50 +1,41 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ClienteEntity } from '../domain/entities/Cliente.entity';
 import { Repository, UpdateResult } from 'typeorm';
-import { ClienteRegister } from '../domain/dto/ClienteRegister.dto';
+import { Cliente } from '../entities/Cliente.entity';
+import { CreateClienteDto } from '../dto/create-cliente.dto';
+import { UpdateClienteDto } from '../dto/update-cliente.dto';
 
 @Injectable()
 export class ClientesService {
   constructor(
-    @InjectRepository(ClienteEntity, 'main')
-    private readonly clienteRepository: Repository<ClienteEntity>,
+    @InjectRepository(Cliente, 'main')
+    private readonly clienteRepository: Repository<Cliente>,
   ) {}
 
   /* Obtener todos los Clientes */
-  async findAll(): Promise<ClienteEntity[]> {
+  async findAll(): Promise<Cliente[]> {
     return await this.clienteRepository.find();
   }
 
   /* Obtener un Cliente por ID */
-  async findOne(idCliente: number): Promise<ClienteEntity> {
+  async findOne(idCliente: number): Promise<Cliente> {
     return await this.clienteRepository.findOneBy({ idCliente });
   }
 
   /* Crear un Cliente */
-  async create(cliente: ClienteRegister): Promise<ClienteEntity> {
-    const clienteEntity = new ClienteEntity();
-    clienteEntity.nombre = cliente.nombre;
-    clienteEntity.apellidos = cliente.apellidos;
-    clienteEntity.telefono = cliente.telefono;
-    clienteEntity.email = cliente.email;
-    clienteEntity.pais = cliente.pais;
-    clienteEntity.ciudad = cliente.ciudad;
+  async create(createClienteDto: CreateClienteDto): Promise<Cliente> {
+    const cliente = new Cliente();
+    Object.assign(cliente, createClienteDto);
 
-    return await this.clienteRepository.save(clienteEntity);
+    return await this.clienteRepository.save(cliente);
   }
 
   /* Actualizar un Cliente */
-  async update(idCliente: number, cliente: ClienteRegister): Promise<UpdateResult> {
+  async update(idCliente: number, updateClienteDto: UpdateClienteDto): Promise<UpdateResult> {
     const clienteToUpdate = await this.clienteRepository.findOneBy({ idCliente });
     if (!clienteToUpdate) throw NotFoundException;
 
-    clienteToUpdate.nombre = cliente.nombre;
-    clienteToUpdate.apellidos = cliente.apellidos;
-    clienteToUpdate.telefono = cliente.telefono;
-    clienteToUpdate.email = cliente.email;
-    clienteToUpdate.pais = cliente.pais;
-    clienteToUpdate.ciudad = cliente.ciudad;
+    Object.assign(clienteToUpdate, updateClienteDto);
     
     return await this.clienteRepository.update(idCliente, clienteToUpdate);
   }
