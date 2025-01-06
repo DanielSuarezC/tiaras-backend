@@ -3,22 +3,25 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientesModule } from './clientes/clientes.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ClienteEntity } from './clientes/domain/entities/Cliente.entity';
 import { AuthModule } from './auth/auth.module';
-import { UsuarioAuthEntity } from './auth/domain/entities/UsuarioAuth.entity';
-import { RolAuthEntity } from './auth/domain/entities/RolAuth.entity';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { ProductosModule } from './productos/productos.module';
-import { ProductoEntity } from './productos/domain/entities/Producto.entity';
 import { CategoriasModule } from './categorias/categorias.module';
-import { CategoriaEntity } from './categorias/domain/entites/Categoria.entity';
 import { PedidosModule } from './pedidos/pedidos.module';
 import { InventariosModule } from './inventarios/inventarios.module';
-import { PedidoEntity } from './pedidos/domain/entities/pedido.entity';
-import { ItemEntity } from './pedidos/domain/entities/Item.entity';
-import { InventarioProductoEntity } from './inventarios/domain/entities/InventarioProducto.entity';
-import { ProductoStockEntity } from './inventarios/domain/entities/ProductoStock.entity';
 import { InsumosModule } from './insumos/insumos.module';
+import { Insumo } from './insumos/entities/insumo.entity';
+import { Categoria } from './categorias/entites/Categoria.entity';
+import { Cliente } from './clientes/entities/Cliente.entity';
+import { Item } from './pedidos/entities/Item.entity';
+import { Pedido } from './pedidos/entities/Pedido.entity';
+import { Producto } from './productos/entities/Producto.entity';
+import { UsuarioAuth } from './auth/entities/UsuarioAuth.entity';
+import { RolAuth } from './auth/entities/RolAuth.entity';
+import { InsumoStock } from './inventarios/entities/InsumoStock.entity';
+import { InventarioInsumo } from './inventarios/entities/InventarioInsumo.entity';
+import { InventarioProducto } from './inventarios/entities/InventarioProducto.entity';
+import { ProductoStock } from './inventarios/entities/ProductoStock.entity';
 
 @Module({
   imports: [
@@ -30,7 +33,7 @@ import { InsumosModule } from './insumos/insumos.module';
         username: 'postgres',
         password: 'root',
         database: 'tiaras_auth',
-        entities: [UsuarioAuthEntity, RolAuthEntity],
+        entities: [UsuarioAuth, RolAuth],
         autoLoadEntities: true,
         synchronize: true
       }),
@@ -44,7 +47,18 @@ import { InsumosModule } from './insumos/insumos.module';
         username: 'postgres',
         password: 'root',
         database: 'tiaras_main',
-        entities: [ClienteEntity, ProductoEntity, CategoriaEntity, PedidoEntity, ItemEntity, InventarioProductoEntity, ProductoStockEntity],
+        entities: [
+          Cliente, 
+          Producto, 
+          Categoria, 
+          Pedido, 
+          Item, 
+          InventarioProducto, 
+          ProductoStock,
+          Insumo,
+          InsumoStock,
+          InventarioInsumo,
+        ],
         autoLoadEntities: true,
         synchronize: true
       }),
