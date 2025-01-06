@@ -14,10 +14,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })); /* El Fernando dijo: Es bien importante y hay que utilizarla */
 
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle('API de Tiaras')
+    .setDescription('API de Tiaras')
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('Tiaras')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
