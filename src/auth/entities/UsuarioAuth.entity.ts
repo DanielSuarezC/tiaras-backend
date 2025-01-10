@@ -4,7 +4,7 @@ import { RolAuth } from "./RolAuth.entity";
 
 @Entity({ name: 'usuarios' })
 export class UsuarioAuth {
-    @PrimaryGeneratedColumn("identity", { name: 'id_usuario' })
+    @PrimaryGeneratedColumn({ name: 'id_usuario', type: 'int' })
     idUsuario: number;
 
     @Column({ type: 'varchar', length: 60, unique: true, name: 'email', nullable: false })
